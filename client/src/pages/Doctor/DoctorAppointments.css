@@ -1,0 +1,345 @@
+/* Doctor Appointments Page Styles */
+.doctor-appointments-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* Page Title */
+.doctor-appointments-page .page-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Page Divider */
+.doctor-appointments-page hr {
+  border: none;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+  margin: 30px auto;
+  max-width: 200px;
+  border-radius: 2px;
+}
+
+/* Table Container */
+.appointments-table-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+/* Table Styling */
+.appointments-table-container .ant-table {
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.appointments-table-container .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.appointments-table-container .ant-table-tbody > tr > td {
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid #e9ecef;
+  padding: 16px 12px;
+  font-size: 14px;
+  color: #495057;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.appointments-table-container .ant-table-tbody > tr:hover > td {
+  background: rgba(102, 126, 234, 0.05);
+  color: #2c3e50;
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(even) > td {
+  background: rgba(248, 249, 250, 0.8);
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(even):hover > td {
+  background: rgba(102, 126, 234, 0.08);
+}
+
+/* Avatar Styling */
+.appointments-table-container .ant-avatar {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Tag Styling */
+.appointments-table-container .ant-tag {
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border: none;
+}
+
+.appointments-table-container .ant-tag[color="orange"] {
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  color: white;
+}
+
+.appointments-table-container .ant-tag[color="blue"] {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.appointments-table-container .ant-tag[color="green"] {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+}
+
+.appointments-table-container .ant-tag[color="red"] {
+  background: linear-gradient(135deg, #e17055, #d63031);
+  color: white;
+}
+
+/* Button Styling */
+.appointments-table-container .ant-btn {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  height: 32px;
+  padding: 0 12px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.appointments-table-container .ant-btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  color: #ffffff !important;
+}
+
+.appointments-table-container .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.appointments-table-container .ant-btn-danger {
+  background: linear-gradient(135deg, #e17055, #d63031);
+  box-shadow: 0 2px 8px rgba(225, 112, 85, 0.3);
+  color: #ffffff !important;
+}
+
+.appointments-table-container .ant-btn-danger:hover {
+  background: linear-gradient(135deg, #d63031, #c0392b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 112, 85, 0.4);
+}
+
+/* Ensure gradient inline-styled buttons keep white text */
+.appointments-table-container .ant-btn[style*="linear-gradient"] {
+  color: #ffffff !important;
+}
+
+/* Secondary buttons like Edit use dark text */
+.appointments-table-container .ant-btn:not(.ant-btn-primary):not(.ant-btn-danger) {
+  color: #1f2937;
+}
+
+/* Modal Styling */
+.ant-modal .ant-modal-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 8px 8px 0 0;
+}
+
+.ant-modal .ant-modal-title {
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.ant-modal .ant-modal-close {
+  color: white;
+}
+
+.ant-modal .ant-modal-close:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ant-modal .ant-descriptions {
+  margin-top: 20px;
+}
+
+.ant-modal .ant-descriptions-item-label {
+  font-weight: 600;
+  color: #2c3e50;
+  background: #f8f9fa;
+  padding: 8px 12px;
+}
+
+.ant-modal .ant-descriptions-item-content {
+  padding: 8px 12px;
+  color: #495057;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .doctor-appointments-page {
+    padding: 20px;
+  }
+  
+  .appointments-table-container {
+    padding: 25px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-appointments-page {
+    padding: 16px;
+  }
+  
+  .doctor-appointments-page .page-title {
+    font-size: 2.5rem;
+  }
+  
+  .appointments-table-container {
+    padding: 20px;
+    border-radius: 15px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .appointments-table-container .ant-btn {
+    height: 28px;
+    font-size: 11px;
+    padding: 0 8px;
+  }
+  
+  .ant-modal {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .doctor-appointments-page .page-title {
+    font-size: 2rem;
+  }
+  
+  .appointments-table-container {
+    padding: 15px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  
+  .appointments-table-container .ant-btn {
+    height: 26px;
+    font-size: 10px;
+    padding: 0 6px;
+  }
+}
+
+/* Table Scroll */
+.appointments-table-container .ant-table-body {
+  overflow-x: auto;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+}
+
+/* Animation for table rows */
+.appointments-table-container .ant-table-tbody > tr {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(1) { animation-delay: 0.1s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(2) { animation-delay: 0.2s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(3) { animation-delay: 0.3s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(4) { animation-delay: 0.4s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus states for accessibility */
+.appointments-table-container .ant-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .appointments-table-container {
+    border: 2px solid #000;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th {
+    border: 1px solid #000;
+  }
+  
+  .appointments-table-container .ant-table-tbody > tr > td {
+    border: 1px solid #000;
+  }
+  
+  .appointments-table-container .ant-btn {
+    border: 2px solid #000;
+  }
+}
+

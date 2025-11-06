@@ -71,7 +71,7 @@ router.post("/login", async (req, res) => {
         .status(200)
         .send({ message: "Password is incorrect", success: false });
     } else {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "your-secret-key-here-please-change-this-in-production", {
         expiresIn: "1d",
       });
       res
@@ -113,14 +113,39 @@ router.post("/apply-doctor-account", authMiddleware, upload.fields([
   { name: 'internshipCertificate', maxCount: 1 }
 ]), async (req, res) => {
   try {
+    // Check for file validation errors
+    if (req.fileValidationError) {
+      return res.status(400).send({
+        message: req.fileValidationError,
+        success: false,
+      });
+    }
+    
+    console.log("Request body:", req.body);
+    console.log("Request files:", req.files);
+    console.log("User ID from auth:", req.body.userId);
+    
     // Get file paths from uploaded files
     const photoPath = req.files.photo ? req.files.photo[0].path : null;
     const mbbsCertificatePath = req.files.mbbsCertificate ? req.files.mbbsCertificate[0].path : null;
     const internshipCertificatePath = req.files.internshipCertificate ? req.files.internshipCertificate[0].path : null;
 
+    // Ensure userId is available (check both authMiddleware and form data)
+    const userId = req.body.userId || req.userId;
+    if (!userId) {
+      return res.status(400).send({
+        message: "User ID not found in request",
+        success: false,
+      });
+    }
+    
+    // Set userId in req.body for consistency
+    req.body.userId = userId;
+
     // Create new doctor with file paths
     const newdoctor = new Doctor({
       ...req.body,
+      userId: req.body.userId, // Ensure userId is explicitly set
       photo: photoPath,
       mbbsCertificate: mbbsCertificatePath,
       internshipCertificate: internshipCertificatePath,
@@ -130,27 +155,30 @@ router.post("/apply-doctor-account", authMiddleware, upload.fields([
     await newdoctor.save();
     const adminUser = await User.findOne({ isAdmin: true });
 
-    const unseenNotifications = adminUser.unseenNotifications;
-    unseenNotifications.push({
-      type: "new-doctor-request",
-      message: `${newdoctor.firstName} ${newdoctor.lastName} has applied for a doctor account`,
-      data: {
-        doctorId: newdoctor._id,
-        name: newdoctor.firstName + " " + newdoctor.lastName,
-      },
-      onClickPath: "/admin/doctorslist",
-    });
-    await User.findByIdAndUpdate(adminUser._id, { unseenNotifications });
+    if (adminUser) {
+      const unseenNotifications = adminUser.unseenNotifications;
+      unseenNotifications.push({
+        type: "new-doctor-request",
+        message: `${newdoctor.firstName} ${newdoctor.lastName} has applied for a doctor account`,
+        data: {
+          doctorId: newdoctor._id,
+          name: newdoctor.firstName + " " + newdoctor.lastName,
+        },
+        onClickPath: "/admin/doctorslist",
+        createdAt: new Date()
+      });
+      await User.findByIdAndUpdate(adminUser._id, { unseenNotifications });
+    }
     res.status(200).send({
       success: true,
       message: "Doctor account applied successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("Apply doctor error:", error);
     res.status(500).send({
-      message: "Error applying doctor account",
+      message: "Error applying doctor account: " + error.message,
       success: false,
-      error,
+      error: error.message,
     });
   }
 });
@@ -238,20 +266,167 @@ router.post("/book-appointment", authMiddleware, async (req, res) => {
         success: false,
       });
     }
-    
+    // Validate requested time is within doctor's working hours and according to availability rules
+    const doctorForBooking = await Doctor.findById(req.body.doctorId);
+    if (!doctorForBooking) {
+      return res.status(404).send({
+        message: "Doctor not found",
+        success: false,
+      });
+    }
+    // Handle timings stored as Array or JSON string
+    let startTimeStr = null;
+    let endTimeStr = null;
+    if (Array.isArray(doctorForBooking.timings)) {
+      startTimeStr = doctorForBooking.timings[0];
+      endTimeStr = doctorForBooking.timings[1];
+    } else if (typeof doctorForBooking.timings === "string") {
+      try {
+        const parsed = JSON.parse(doctorForBooking.timings);
+        if (Array.isArray(parsed)) {
+          startTimeStr = parsed[0];
+          endTimeStr = parsed[1];
+        }
+      } catch (_) {}
+    }
+    if (!startTimeStr || !endTimeStr) {
+      return res.status(400).send({
+        message: "Doctor working hours not configured",
+        success: false,
+      });
+    }
+    const workStart = moment(startTimeStr, "HH:mm");
+    const workEnd = moment(endTimeStr, "HH:mm");
+    if (!appointmentTime.isBetween(workStart, workEnd, undefined, "[]")) {
+      return res.status(400).send({
+        message: `Selected time must be between ${workStart.format("HH:mm")} and ${workEnd.format("HH:mm")}`,
+        success: false,
+      });
+    }
+
+    // Check doctor's working day and holidays
+    const dayKey = appointmentDate.format("ddd");
+    if (Array.isArray(doctorForBooking.workingDays) && doctorForBooking.workingDays.length > 0) {
+      if (!doctorForBooking.workingDays.includes(dayKey)) {
+        return res.status(400).send({
+          message: "Selected date is a non-working day for the doctor",
+          success: false,
+        });
+      }
+    }
+    if (Array.isArray(doctorForBooking.holidays) && doctorForBooking.holidays.includes(appointmentDate.format("DD-MM-YYYY"))) {
+      return res.status(400).send({
+        message: "Selected date is a holiday for the doctor",
+        success: false,
+      });
+    }
+
+    // Enforce slot grid (optional: align to doctor's slotDurationMinutes)
+    const slotMinutes = Number(doctorForBooking.slotDurationMinutes || 30);
+    const minutesFromStart = appointmentTime.diff(workStart, 'minutes');
+    if (slotMinutes > 0 && minutesFromStart % slotMinutes !== 0) {
+      return res.status(400).send({
+        message: `Please select time aligned to ${slotMinutes}-minute slots`,
+        success: false,
+      });
+    }
+
     req.body.status = "pending";
-    req.body.date = appointmentDate.toISOString();
-    req.body.time = appointmentTime.toISOString();
-    const newAppointment = new Appointment(req.body);
+    // Persist in the same string formats used by the client and doctor UI
+    req.body.date = appointmentDate.format("DD-MM-YYYY");
+    req.body.time = appointmentTime.format("HH:mm");
+    
+    // Create a properly structured appointment object
+    const appointmentData = {
+      userId: req.body.userId,
+      doctorId: req.body.doctorId,
+      doctorInfo: {
+        firstName: req.body.doctorInfo?.firstName || '',
+        lastName: req.body.doctorInfo?.lastName || '',
+        phoneNumber: req.body.doctorInfo?.phoneNumber || '',
+        specialization: req.body.doctorInfo?.specialization || '',
+        address: req.body.doctorInfo?.address || '',
+        feePerCunsultation: req.body.doctorInfo?.feePerCunsultation || 0
+      },
+      userInfo: {
+        name: req.body.userInfo?.name || '',
+        email: req.body.userInfo?.email || '',
+        phoneNumber: req.body.userInfo?.phoneNumber || ''
+      },
+      date: req.body.date,
+      time: req.body.time,
+      status: req.body.status,
+      symptoms: req.body.symptoms || []
+    };
+    
+    const newAppointment = new Appointment(appointmentData);
     await newAppointment.save();
-    //pushing notification to doctor based on his userid
-    const user = await User.findOne({ _id: req.body.doctorInfo.userId });
-    user.unseenNotifications.push({
-      type: "new-appointment-request",
-      message: `A new appointment request has been made by ${req.body.userInfo.name}`,
-      onClickPath: "/doctor/appointments",
-    });
-    await user.save();
+    // Notify doctor
+    let doctorUser = null;
+    try {
+      // Prefer lookup from doctorId to avoid stale doctorInfo
+      const doctor = await Doctor.findById(req.body.doctorId);
+      if (doctor && doctor.userId) {
+        doctorUser = await User.findById(doctor.userId);
+      }
+      if (!doctorUser && req.body.doctorInfo?.userId) {
+        doctorUser = await User.findById(req.body.doctorInfo.userId);
+      }
+    } catch (error) {
+      console.log("Error finding doctor user:", error);
+    }
+
+    // Create symptoms list for notification
+    const symptomsList = appointmentData.symptoms && appointmentData.symptoms.length > 0 
+      ? appointmentData.symptoms.join(", ") 
+      : "No symptoms specified";
+
+    if (doctorUser) {
+      doctorUser.unseenNotifications.push({
+        type: "new-appointment-request",
+        message: `New appointment request from ${appointmentData.userInfo.name}. Date: ${appointmentData.date}, Time: ${appointmentData.time}. Symptoms: ${symptomsList}`,
+        onClickPath: "/doctor/appointments",
+        createdAt: new Date()
+      });
+      await doctorUser.save();
+      console.log("Notification sent to doctor:", doctorUser.name);
+    } else {
+      console.log("Doctor user not found for notification");
+    }
+
+    // Notify admin
+    const adminUser = await User.findOne({ isAdmin: true });
+    if (adminUser) {
+      adminUser.unseenNotifications.push({
+        type: "new-appointment",
+        message: `New appointment booked by ${appointmentData.userInfo.name} with Dr. ${appointmentData.doctorInfo?.firstName || ""} ${appointmentData.doctorInfo?.lastName || ""}. Date: ${appointmentData.date}, Time: ${appointmentData.time}. Symptoms: ${symptomsList}`.trim(),
+        onClickPath: "/admin/dashboard",
+        createdAt: new Date()
+      });
+      await adminUser.save();
+      console.log("Notification sent to admin:", adminUser.name);
+    } else {
+      console.log("Admin user not found for notification");
+    }
+
+    // Notify booking user (confirmation)
+    try {
+      const bookingUser = await User.findById(appointmentData.userId);
+      if (bookingUser) {
+        bookingUser.unseenNotifications.push({
+          type: "appointment-booked",
+          message: `Your appointment with Dr. ${appointmentData.doctorInfo?.firstName || ""} ${appointmentData.doctorInfo?.lastName || ""} has been booked successfully. Date: ${appointmentData.date}, Time: ${appointmentData.time}. Symptoms: ${symptomsList}`,
+          onClickPath: "/appointments",
+          createdAt: new Date()
+        });
+        await bookingUser.save();
+        console.log("Notification sent to booking user:", bookingUser.name);
+      } else {
+        console.log("Booking user not found for notification");
+      }
+    } catch (error) {
+      console.log("Error sending notification to booking user:", error);
+    }
     res.status(200).send({
       message: "Appointment booked successfully",
       success: true,
@@ -261,7 +436,7 @@ router.post("/book-appointment", authMiddleware, async (req, res) => {
     res.status(500).send({
       message: "Error booking appointment",
       success: false,
-      error,
+      error: error.message || error,
     });
   }
 });
@@ -278,19 +453,46 @@ router.post("/check-booking-avilability", authMiddleware, async (req, res) => {
         success: false,
       });
     }
-    
-    const date = moment(req.body.date, "DD-MM-YYYY").toISOString();
-    const fromTime = moment(req.body.time, "HH:mm")
-      .subtract(1, "hours")
-      .toISOString();
-    const toTime = moment(req.body.time, "HH:mm").add(1, "hours").toISOString();
+    // Ensure requested time falls within doctor's working hours
+    const doctor = await Doctor.findById(req.body.doctorId);
+    if (!doctor) {
+      return res.status(404).send({ message: "Doctor not found", success: false });
+    }
+    let startTimeStr = null;
+    let endTimeStr = null;
+    if (Array.isArray(doctor.timings)) {
+      startTimeStr = doctor.timings[0];
+      endTimeStr = doctor.timings[1];
+    } else if (typeof doctor.timings === "string") {
+      try {
+        const parsed = JSON.parse(doctor.timings);
+        if (Array.isArray(parsed)) {
+          startTimeStr = parsed[0];
+          endTimeStr = parsed[1];
+        }
+      } catch (_) {}
+    }
+    if (!startTimeStr || !endTimeStr) {
+      return res.status(400).send({ message: "Doctor working hours not configured", success: false });
+    }
+    const workStart = moment(startTimeStr, "HH:mm");
+    const workEnd = moment(endTimeStr, "HH:mm");
+    const requestedTime = moment(req.body.time, "HH:mm");
+    if (!requestedTime.isBetween(workStart, workEnd, undefined, "[]")) {
+      return res.status(200).send({
+        message: `Selected time must be between ${workStart.format("HH:mm")} and ${workEnd.format("HH:mm")}`,
+        success: false,
+      });
+    }
+
     const doctorId = req.body.doctorId;
-    const appointments = await Appointment.find({
-      doctorId,
-      date,
-      time: { $gte: fromTime, $lte: toTime },
-    });
-    if (appointments.length > 0) {
+    const dateStr = moment(req.body.date, "DD-MM-YYYY").format("DD-MM-YYYY");
+    
+    // Conflict check: exact slot matching by time for same date
+    const sameDayAppointments = await Appointment.find({ doctorId: doctorId, date: dateStr });
+    const conflict = sameDayAppointments.some(a => a.time === requestedTime.format("HH:mm"));
+
+    if (conflict) {
       return res.status(200).send({
         message: "Appointments not available",
         success: false,
@@ -304,9 +506,9 @@ router.post("/check-booking-avilability", authMiddleware, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      message: "Error booking appointment",
+      message: "Error checking appointment availability",
       success: false,
-      error,
+      error: error.message || error,
     });
   }
 });
@@ -324,7 +526,7 @@ router.get("/get-appointments-by-user-id", authMiddleware, async (req, res) => {
     res.status(500).send({
       message: "Error fetching appointments",
       success: false,
-      error,
+      error: error.message || error,
     });
   }
 });
@@ -357,6 +559,39 @@ router.post("/recommend-doctor", authMiddleware, async (req, res) => {
     console.log(error);
     res.status(500).send({
       message: "Error recommending doctors",
+      success: false,
+      error,
+    });
+  }
+});
+
+// Add search doctors endpoint
+router.post("/search-doctors", authMiddleware, async (req, res) => {
+  try {
+    const { searchTerm } = req.body;
+    
+    // Search for doctors by name (firstName or lastName)
+    const doctors = await Doctor.find({
+      $and: [
+        { status: "approved" },
+        {
+          $or: [
+            { firstName: { $regex: searchTerm, $options: "i" } },
+            { lastName: { $regex: searchTerm, $options: "i" } }
+          ]
+        }
+      ]
+    });
+    
+    res.status(200).send({
+      success: true,
+      message: doctors.length > 0 ? "Doctors found" : "No doctors found",
+      data: doctors,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Error searching doctors",
       success: false,
       error,
     });

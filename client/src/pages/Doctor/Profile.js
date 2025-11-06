@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, TimePicker } from "antd";
+import { Button, Col, Form, Input, Row, TimePicker, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,9 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import DoctorForm from "../../components/DoctorForm";
 import moment from "moment";
+import "../Profile.css";
+
+const { Title } = Typography;
 
 function Profile() {
   const { user } = useSelector((state) => state.user);
@@ -77,9 +80,11 @@ function Profile() {
   }, []);
   return (
     <Layout>
-      <h1 className="page-title">Doctor Profile</h1>
-      <hr />
-      {doctor && <DoctorForm onFinish={onFinish} initivalValues={doctor} />}
+      <div className="profile-page">
+        <Title level={1} className="page-title">Doctor Profile</Title>
+        <hr />
+        {doctor && <DoctorForm onFinish={onFinish} initivalValues={doctor} />}
+      </div>
     </Layout>
   );
 }

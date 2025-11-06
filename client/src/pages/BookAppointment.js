@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, Form, Input, Row, TimePicker } from "antd";
+import { Button, Col, DatePicker, Form, Input, Row, TimePicker, Select, Card, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,15 +9,53 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import DoctorForm from "../components/DoctorForm";
 import moment from "moment";
 
+const { Option } = Select;
+const { Title } = Typography;
+
 function BookAppointment() {
   const [isAvailable, setIsAvailable] = useState(false);
   const navigate = useNavigate();
   const [date, setDate] = useState();
   const [time, setTime] = useState();
+  const [symptoms, setSymptoms] = useState([]);
   const { user } = useSelector((state) => state.user);
   const [doctor, setDoctor] = useState(null);
   const params = useParams();
   const dispatch = useDispatch();
+
+  // Common symptoms/diseases list
+  const commonSymptoms = [
+    "Fever",
+    "Cough",
+    "Headache",
+    "Cold",
+    "Flu",
+    "Stomach Pain",
+    "Back Pain",
+    "Joint Pain",
+    "Allergies",
+    "Skin Rash",
+    "Sore Throat",
+    "Nausea",
+    "Vomiting",
+    "Diarrhea",
+    "Fatigue",
+    "Dizziness",
+    "Shortness of Breath",
+    "Chest Pain",
+    "High Blood Pressure",
+    "Diabetes",
+    "Anxiety",
+    "Depression",
+    "Insomnia",
+    "Weight Loss",
+    "Weight Gain",
+    "Eye Problems",
+    "Ear Problems",
+    "Nose Problems",
+    "Throat Problems",
+    "Dental Problems"
+  ];
 
   const getDoctorData = async () => {
     try {
@@ -36,7 +74,20 @@ function BookAppointment() {
 
       dispatch(hideLoading());
       if (response.data.success) {
-        setDoctor(response.data.data);
+        const d = response.data.data;
+        // Normalize timings to an array [start,end]
+        let timings = d?.timings;
+        if (timings && !Array.isArray(timings) && typeof timings === 'string') {
+          try {
+            const parsed = JSON.parse(timings);
+            if (Array.isArray(parsed)) timings = parsed;
+          } catch (e) {
+            // fallback: try to split by comma e.g. "10:00,17:00"
+            const parts = timings.split(',');
+            if (parts.length === 2) timings = parts.map(s => s.trim());
+          }
+        }
+        setDoctor({ ...d, timings });
       }
     } catch (error) {
       console.log(error);
@@ -57,6 +108,16 @@ function BookAppointment() {
     if (selectedDateTime.isBefore(currentDateTime)) {
       toast.error("Cannot book appointments in the past. Please select a future date and time.");
       return;
+    }
+    // Ensure time is within doctor's working hours
+    if (doctor && doctor.timings && doctor.timings.length === 2) {
+      const workStart = moment(doctor.timings[0], "HH:mm");
+      const workEnd = moment(doctor.timings[1], "HH:mm");
+      const selectedTimeOnly = moment(time, "HH:mm");
+      if (!selectedTimeOnly.isBetween(workStart, workEnd, undefined, "[]")) {
+        toast.error(`Selected time must be between ${workStart.format("HH:mm")} and ${workEnd.format("HH:mm")}`);
+        return;
+      }
     }
 
     try {
@@ -88,7 +149,17 @@ function BookAppointment() {
   };
   const bookNow = async () => {
     setIsAvailable(false);
-    
+    // Ensure time is within doctor's working hours before booking
+    if (doctor && doctor.timings && doctor.timings.length === 2) {
+      const workStart = moment(doctor.timings[0], "HH:mm");
+      const workEnd = moment(doctor.timings[1], "HH:mm");
+      const selectedTimeOnly = moment(time, "HH:mm");
+      if (!selectedTimeOnly.isBetween(workStart, workEnd, undefined, "[]")) {
+        toast.error(`Selected time must be between ${workStart.format("HH:mm")} and ${workEnd.format("HH:mm")}`);
+        return;
+      }
+    }
+
     // Double-check validation before booking
     if (!date || !time) {
       toast.error("Please select both date and time");
@@ -103,6 +174,12 @@ function BookAppointment() {
       return;
     }
 
+    // Check if symptoms are selected
+    if (symptoms.length === 0) {
+      toast.error("Please select at least one symptom");
+      return;
+    }
+
     try {
       dispatch(showLoading());
       const response = await axios.post(
@@ -110,10 +187,22 @@ function BookAppointment() {
         {
           doctorId: params.doctorId,
           userId: user._id,
-          doctorInfo: doctor,
-          userInfo: user,
+          doctorInfo: {
+            firstName: doctor.firstName,
+            lastName: doctor.lastName,
+            phoneNumber: doctor.phoneNumber,
+            specialization: doctor.specialization,
+            address: doctor.address,
+            feePerCunsultation: doctor.feePerCunsultation
+          },
+          userInfo: {
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber || ""
+          },
           date: date,
           time: time,
+          symptoms: symptoms
         },
         {
           headers: {
@@ -147,12 +236,20 @@ function BookAppointment() {
           <Row gutter={20} className="mt-5" align="middle">
 
             <Col span={8} sm={24} xs={24} lg={8}>
-              <img
-                src="https://thumbs.dreamstime.com/b/finger-press-book-now-button-booking-reservation-icon-online-149789867.jpg"
-                alt=""
-                width="100%"
-                height='400'
-              />
+              <div style={{
+                width: '100%',
+                height: 400,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #e0e7ff 0%, #f5f3ff 100%)',
+                borderRadius: 12,
+                border: '1px solid #e5e7eb'
+              }}>
+                <span className="gradient-text" style={{ fontSize: 28, fontWeight: 700 }}>
+                  Book Your Appointment
+                </span>
+              </div>
             </Col>
             <Col span={8} sm={24} xs={24} lg={8}>
               <h1 className="normal-text">
@@ -204,12 +301,50 @@ function BookAppointment() {
                     // Default business hours: 8 AM to 8 PM
                     return [0, 1, 2, 3, 4, 5, 6, 7, 20, 21, 22, 23];
                   }}
+                  disabledMinutes={(selectedHour) => {
+                    // Disable minutes outside [start,end] bounds when on edge hours
+                    if (!(doctor && doctor.timings && doctor.timings.length === 2)) return [];
+                    const start = doctor.timings[0];
+                    const end = doctor.timings[1];
+                    const startHour = parseInt(start.split(':')[0]);
+                    const startMinute = parseInt(start.split(':')[1]);
+                    const endHour = parseInt(end.split(':')[0]);
+                    const endMinute = parseInt(end.split(':')[1]);
+                    const mins = [];
+                    // If before start hour or after end hour, all minutes disabled (already handled by disabledHours)
+                    if (selectedHour === startHour) {
+                      for (let m = 0; m < startMinute; m++) mins.push(m);
+                    }
+                    if (selectedHour === endHour) {
+                      for (let m = endMinute + 1; m < 60; m++) mins.push(m);
+                    }
+                    return mins;
+                  }}
                   minuteStep={15}
                   onChange={(value) => {
                     setIsAvailable(false);
                     setTime(moment(value).format("HH:mm"));
                   }}
                 />
+                
+                <Card title="Select Symptoms" className="mt-3">
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="Select symptoms"
+                    value={symptoms}
+                    onChange={(value) => setSymptoms(value)}
+                    tokenSeparators={[',']}
+                  >
+                    {commonSymptoms.map(symptom => (
+                      <Option key={symptom} value={symptom}>{symptom}</Option>
+                    ))}
+                  </Select>
+                  <p className="text-muted mt-2" style={{ fontSize: '12px', color: '#666' }}>
+                    * Select all symptoms that apply to your condition
+                  </p>
+                </Card>
+                
                 <p className="text-muted mt-2" style={{ fontSize: '12px', color: '#666' }}>
                   * Only current date and future dates are available for booking
                 </p>

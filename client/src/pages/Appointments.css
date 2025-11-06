@@ -1,0 +1,349 @@
+/* Appointments Page Styles */
+.appointments-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* Page Title */
+.appointments-page .page-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Page Divider */
+.appointments-page hr {
+  border: none;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+  margin: 30px auto;
+  max-width: 200px;
+  border-radius: 2px;
+}
+
+/* Table Container */
+.appointments-table-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+/* Table Styling */
+.appointments-table-container .ant-table {
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.appointments-table-container .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.appointments-table-container .ant-table-tbody > tr > td {
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid #e9ecef;
+  padding: 16px 12px;
+  font-size: 14px;
+  color: #495057;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.appointments-table-container .ant-table-tbody > tr:hover > td {
+  background: rgba(102, 126, 234, 0.05);
+  color: #2c3e50;
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(even) > td {
+  background: rgba(248, 249, 250, 0.8);
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(even):hover > td {
+  background: rgba(102, 126, 234, 0.08);
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  color: white;
+  box-shadow: 0 2px 8px rgba(253, 203, 110, 0.3);
+}
+
+.status-approved {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
+}
+
+.status-rejected {
+  background: linear-gradient(135deg, #e17055, #d63031);
+  color: white;
+  box-shadow: 0 2px 8px rgba(225, 112, 85, 0.3);
+}
+
+.status-completed {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  box-shadow: 0 2px 8px rgba(116, 185, 255, 0.3);
+}
+
+/* Doctor Name Styling */
+.doctor-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 15px;
+}
+
+/* Phone Number Styling */
+.phone-number {
+  color: #6c757d;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* Date and Time Styling */
+.appointment-datetime {
+  color: #495057;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Appointment ID Styling */
+.appointment-id {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Empty State */
+.empty-appointments {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-appointments .ant-empty-description {
+  font-size: 18px;
+  color: #6c757d;
+  margin-top: 20px;
+}
+
+.empty-appointments .ant-empty-image {
+  margin-bottom: 20px;
+}
+
+/* Loading State */
+.appointments-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.appointments-loading .ant-spin {
+  font-size: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .appointments-table-container {
+    padding: 25px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .appointments-page {
+    padding: 16px;
+  }
+  
+  .appointments-page .page-title {
+    font-size: 2.5rem;
+  }
+  
+  .appointments-table-container {
+    padding: 20px;
+    border-radius: 15px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 10px;
+    min-width: 60px;
+  }
+  
+  .doctor-name {
+    font-size: 13px;
+  }
+  
+  .phone-number {
+    font-size: 11px;
+  }
+  
+  .appointment-datetime {
+    font-size: 12px;
+  }
+  
+  .appointment-id {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .appointments-page .page-title {
+    font-size: 2rem;
+  }
+  
+  .appointments-table-container {
+    padding: 15px;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th,
+  .appointments-table-container .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  
+  .status-badge {
+    padding: 3px 6px;
+    font-size: 9px;
+    min-width: 50px;
+  }
+}
+
+/* Table Scroll */
+.appointments-table-container .ant-table-body {
+  overflow-x: auto;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.appointments-table-container .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+}
+
+/* Animation for table rows */
+.appointments-table-container .ant-table-tbody > tr {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.appointments-table-container .ant-table-tbody > tr:nth-child(1) { animation-delay: 0.1s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(2) { animation-delay: 0.2s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(3) { animation-delay: 0.3s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(4) { animation-delay: 0.4s; }
+.appointments-table-container .ant-table-tbody > tr:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus states for accessibility */
+.appointments-table-container .ant-table-tbody > tr:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .appointments-table-container {
+    border: 2px solid #000;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th {
+    border: 1px solid #000;
+  }
+  
+  .appointments-table-container .ant-table-tbody > tr > td {
+    border: 1px solid #000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .appointments-page {
+    background: white;
+    padding: 0;
+  }
+  
+  .appointments-table-container {
+    background: white;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .appointments-table-container .ant-table-thead > tr > th {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+  }
+  
+  .appointments-table-container .ant-table-tbody > tr > td {
+    background: white !important;
+    color: #000 !important;
+  }
+}

@@ -1,6 +1,6 @@
-import { Button, Col, Form, Input, Row, TimePicker } from "antd";
 import React from "react";
 import Layout from "../components/Layout";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { showLoading, hideLoading } from "../redux/alertsSlice";
 import { toast } from "react-hot-toast";
@@ -13,9 +13,13 @@ function ApplyDoctor() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const standalone = searchParams.get("standalone") === "1";
 
   const onFinish = async (values) => {
     try {
+      console.log("Form values:", values);
       dispatch(showLoading());
       
       // Create FormData object to handle file uploads
@@ -31,12 +35,24 @@ function ApplyDoctor() {
       // Handle file uploads
       if (values.photo?.[0]?.originFileObj) {
         formData.append('photo', values.photo[0].originFileObj);
+      } else {
+        toast.error("Please upload a profile photo");
+        dispatch(hideLoading());
+        return;
       }
       if (values.mbbsCertificate?.[0]?.originFileObj) {
         formData.append('mbbsCertificate', values.mbbsCertificate[0].originFileObj);
+      } else {
+        toast.error("Please upload MBBS certificate");
+        dispatch(hideLoading());
+        return;
       }
       if (values.internshipCertificate?.[0]?.originFileObj) {
         formData.append('internshipCertificate', values.internshipCertificate[0].originFileObj);
+      } else {
+        toast.error("Please upload internship certificate");
+        dispatch(hideLoading());
+        return;
       }
 
       // Format timings
@@ -45,8 +61,16 @@ function ApplyDoctor() {
         moment(values.timings[1]).format("HH:mm"),
       ]));
 
-      // Add user ID
-      formData.append('userId', user._id);
+      // Add userId manually (temporary fix)
+      if (user && user._id) {
+        formData.append('userId', user._id);
+        console.log("Added userId manually:", user._id);
+      }
+
+      console.log("FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
       const response = await axios.post(
         "/api/user/apply-doctor-account",
@@ -62,23 +86,31 @@ function ApplyDoctor() {
       dispatch(hideLoading());
       if (response.data.success) {
         toast.success(response.data.message);
-        navigate("/");
+        navigate("/login/doctor");
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       dispatch(hideLoading());
-      toast.error("Something went wrong");
+      console.error("Apply doctor error:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        toast.error(error.response.data.message || "Something went wrong");
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 
-  return (
-    <Layout>
+  const content = (
+    <div style={{ padding: standalone ? 24 : 0 }}>
       <h1 className="page-title">Apply Doctor</h1>
       <hr />
       <DoctorForm onFinish={onFinish} />
-    </Layout>
+    </div>
   );
+
+  return standalone ? content : <Layout>{content}</Layout>;
 }
 
 export default ApplyDoctor;

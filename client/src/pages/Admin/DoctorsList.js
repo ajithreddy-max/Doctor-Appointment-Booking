@@ -4,8 +4,11 @@ import Layout from "../../components/Layout";
 import { showLoading, hideLoading } from "../../redux/alertsSlice";
 import {toast} from 'react-hot-toast'
 import axios from "axios";
-import { Table } from "antd";
+import { Table, Card, Typography, Tag, Button } from "antd";
 import moment from "moment";
+import "../Admin.css";
+
+const { Title } = Typography;
 
 function DoctorsList() {
   const [doctors, setDoctors] = useState([]);
@@ -52,49 +55,109 @@ function DoctorsList() {
   useEffect(() => {
     getDoctorsData();
   }, []);
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'orange';
+      case 'approved':
+        return 'green';
+      case 'blocked':
+        return 'red';
+      default:
+        return 'default';
+    }
+  };
+
   const columns = [
     {
-      title: "Name",
+      title: "Doctor Name",
       dataIndex: "name",
       render: (text, record) => (
-        <span>
-          {record.firstName} {record.lastName}
+        <span style={{ fontWeight: 600, color: '#2c3e50' }}>
+          Dr. {record.firstName} {record.lastName}
         </span>
       ),
     },
     {
-      title: "Phone",
+      title: "Phone Number",
       dataIndex: "phoneNumber",
+      render: (text) => (
+        <span style={{ fontFamily: 'monospace', color: '#6c757d' }}>
+          {text}
+        </span>
+      ),
     },
     {
-      title: "Created At",
+      title: "Specialization",
+      dataIndex: "specialization",
+      render: (text) => (
+        <Tag color="blue" style={{ borderRadius: 12, fontWeight: 600 }}>
+          {text}
+        </Tag>
+      ),
+    },
+    {
+      title: "Joined Date",
       dataIndex: "createdAt",
-      render: (record , text) => moment(record.createdAt).format("DD-MM-YYYY"),
+      render: (record, text) => moment(record.createdAt).format("MMM DD, YYYY"),
     },
     {
-      title: "status",
+      title: "Status",
       dataIndex: "status",
+      render: (status) => (
+        <Tag color={getStatusColor(status)} style={{ borderRadius: 12, fontWeight: 600, textTransform: 'uppercase' }}>
+          {status}
+        </Tag>
+      ),
     },
     {
       title: "Actions",
       dataIndex: "actions",
       render: (text, record) => (
-        <div className="d-flex">
+        <div style={{ display: 'flex', gap: '8px' }}>
           {record.status === "pending" && (
-            <h1
-              className="anchor"
+            <Button
+              type="primary"
+              size="small"
               onClick={() => changeDoctorStatus(record, "approved")}
+              style={{ 
+                background: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+                border: 'none',
+                borderRadius: 8,
+                fontWeight: 600
+              }}
             >
               Approve
-            </h1>
+            </Button>
           )}
           {record.status === "approved" && (
-            <h1
-              className="anchor"
+            <Button
+              type="primary"
+              danger
+              size="small"
               onClick={() => changeDoctorStatus(record, "blocked")}
+              style={{ 
+                borderRadius: 8,
+                fontWeight: 600
+              }}
             >
               Block
-            </h1>
+            </Button>
+          )}
+          {record.status === "blocked" && (
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => changeDoctorStatus(record, "approved")}
+              style={{ 
+                background: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+                border: 'none',
+                borderRadius: 8,
+                fontWeight: 600
+              }}
+            >
+              Unblock
+            </Button>
           )}
         </div>
       ),
@@ -102,9 +165,25 @@ function DoctorsList() {
   ];
   return (
     <Layout>
-      <h1 className="page-header">Doctors List</h1>
-      <hr />
-      <Table columns={columns} dataSource={doctors} />
+      <div className="doctors-list-page">
+        <Title level={1} className="page-header">Doctors Management</Title>
+        <hr />
+        <Card className="doctors-table-container">
+          <Table 
+            columns={columns} 
+            dataSource={doctors}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => 
+                `${range[0]}-${range[1]} of ${total} doctors`,
+            }}
+            scroll={{ x: 800 }}
+            rowKey="_id"
+          />
+        </Card>
+      </div>
     </Layout>
   );
 }

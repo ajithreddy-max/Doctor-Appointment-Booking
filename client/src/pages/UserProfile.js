@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, message, Divider, Card, Statistic, Modal, Upload, Avatar } from "antd";
+import { Button, Col, Form, Input, Row, message, Divider, Card, Statistic, Modal, Upload, Avatar, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../redux/userSlice";
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
+import "./Profile.css";
+
+const { Title } = Typography;
 
 function UserProfile() {
   const { user } = useSelector((state) => state.user);
@@ -138,16 +141,16 @@ function UserProfile() {
 
   return (
     <Layout>
-      <div>
-        <h1 className="page-title">User Profile</h1>
+      <div className="profile-page">
+        <Title level={1} className="page-title">User Profile</Title>
         <hr />
-        <Row gutter={20} className="mt-5">
+        <Row gutter={[24, 24]} className="mt-5">
           <Col span={8} sm={24} xs={24} lg={8}>
-            <Card className="text-center">
+            <Card className="profile-info-card text-center">
               <div className="profile-photo-container">
                 <Avatar
                   size={150}
-                  src={profilePhoto ? `http://localhost:5000/${profilePhoto}` : null}
+                  src={profilePhoto ? `http://localhost:5001/${profilePhoto}` : null}
                   icon={<UserOutlined />}
                   className="profile-avatar"
                 />
@@ -262,7 +265,7 @@ function UserProfile() {
             </Card>
           </Col>
           <Col span={16} sm={24} xs={24} lg={16}>
-            <Card title="Edit Profile Information" className="mt-3">
+            <Card title="Edit Profile Information" className="form-card mt-3">
               <Form
                 form={form}
                 layout="vertical"
@@ -335,7 +338,7 @@ function UserProfile() {
               </Form>
             </Card>
             
-            <Card title="Account Information" className="mt-3">
+            <Card title="Account Information" className="account-info-card mt-3">
               <Row gutter={20}>
                 <Col span={12} xs={24} sm={24} lg={12}>
                   <div className="info-item">

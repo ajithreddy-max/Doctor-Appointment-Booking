@@ -30,11 +30,33 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
       default: "pending",
     },
+    symptoms: {
+      type: [String],
+      default: [],
+    },
+    doctorNotes: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    prescription: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    followUpDate: {
+      type: Date,
+      default: null,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const appointmentModel = mongoose.model("appointmenst", appointmentSchema);
+const appointmentModel = mongoose.model("appointments", appointmentSchema);
 module.exports = appointmentModel;

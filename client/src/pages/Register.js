@@ -1,17 +1,21 @@
 import { Button, Form, Input } from "antd";
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { hideLoading, showLoading } from "../redux/alertsSlice";
+import "./Authentication.css";
 
 // Configure axios base URL
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "http://localhost:5001";
 
 function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const next = searchParams.get("next");
   const onFinish = async (values) => {
     try {
       dispatch(showLoading());
@@ -19,7 +23,12 @@ function Register() {
       dispatch(hideLoading());
       if (response.data.success) {
         toast.success(response.data.message);
-        navigate("/login");
+        // Preserve deep link to return to apply-doctor after login
+        if (next) {
+          navigate(`/login?next=${encodeURIComponent(next)}`);
+        } else {
+          navigate("/login");
+        }
       } else {
         toast.error(response.data.message);
       }
@@ -75,6 +84,49 @@ function Register() {
             ]}
           >
             <Input.Password placeholder="Password" />
+          </Form.Item>
+
+          <Form.Item 
+            label="Phone Number" 
+            name="phone"
+            rules={[
+              { required: true, message: 'Please enter your phone number' },
+              { 
+                pattern: /^[0-9]{10}$/, 
+                message: 'Phone number must be 10 digits' 
+              }
+            ]}
+          >
+            <Input placeholder="Phone Number" />
+          </Form.Item>
+
+          <Form.Item 
+            label="Age" 
+            name="age"
+            rules={[
+              { required: true, message: 'Please enter your age' },
+              { 
+                type: 'number', 
+                min: 1, 
+                max: 120, 
+                message: 'Age must be between 1 and 120' 
+              }
+            ]}
+          >
+            <Input type="number" placeholder="Age" />
+          </Form.Item>
+
+          <Form.Item 
+            label="Gender" 
+            name="gender"
+            rules={[{ required: true, message: 'Please select your gender' }]}
+          >
+            <select className="form-control">
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
           </Form.Item>
 
           <Button

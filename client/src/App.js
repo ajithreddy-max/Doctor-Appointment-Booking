@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import RoleLoginLanding from "./pages/RoleLoginLanding";
+import InitialLanding from "./pages/InitialLanding";
 import Register from "./pages/Register";
-import { Button } from "antd";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import { useSelector } from "react-redux";
@@ -12,12 +13,16 @@ import ApplyDoctor from "./pages/ApplyDoctor";
 import Notifications from "./pages/Notifications";
 import Userslist from "./pages/Admin/Userslist";
 import DoctorsList from "./pages/Admin/DoctorsList";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminAppointmentsList from "./pages/Admin/AdminAppointmentsList";
 import Profile from "./pages/Doctor/Profile";
 import BookAppointment from "./pages/BookAppointment";
 import Appointments from "./pages/Appointments";
 import DoctorAppointments from "./pages/Doctor/DoctorAppointments";
+import DoctorDashboard from "./pages/Doctor/Dashboard";
 import DoctorApplicationDetails from "./pages/DoctorApplicationDetails";
 import UserProfile from "./pages/UserProfile";
+import Availability from "./pages/Doctor/Availability";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -25,13 +30,21 @@ function App() {
     <BrowserRouter>
       {loading && (
         <div className="spinner-parent">
-          <div class="spinner-border" role="status"></div>
+          <div className="spinner-border" role="status"></div>
         </div>
       )}
       <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         <Route
           path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login/:role"
           element={
             <PublicRoute>
               <Login />
@@ -49,8 +62,40 @@ function App() {
         <Route
           path="/"
           element={
+            <PublicRoute>
+              <InitialLanding />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/portal-selection"
+          element={
+            <PublicRoute>
+              <RoleLoginLanding />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/home"
+          element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/dashboard"
+          element={
+            <ProtectedRoute>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/availability"
+          element={
+            <ProtectedRoute>
+              <Availability />
             </ProtectedRoute>
           }
         />
@@ -71,6 +116,15 @@ function App() {
           }
         />
         <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/admin/userslist"
           element={
             <ProtectedRoute>
@@ -84,6 +138,15 @@ function App() {
           element={
             <ProtectedRoute>
               <DoctorsList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/appointments"
+          element={
+            <ProtectedRoute>
+              <AdminAppointmentsList />
             </ProtectedRoute>
           }
         />

@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/userModel");
 const Doctor = require("../models/doctorModel");
 const authMiddleware = require("../middlewares/authMiddleware");
+const Appointment = require("../models/appointmentModel");
 
 router.get("/get-all-doctors", authMiddleware, async (req, res) => {
   try {
@@ -51,14 +52,20 @@ router.post(
       });
 
       const user = await User.findOne({ _id: doctor.userId });
-      const unseenNotifications = user.unseenNotifications;
-      unseenNotifications.push({
-        type: "new-doctor-request-changed",
-        message: `Your doctor account has been ${status}`,
-        onClickPath: "/notifications",
-      });
-      user.isDoctor = status === "approved" ? true : false;
-      await user.save();
+      if (user) {
+        const unseenNotifications = user.unseenNotifications;
+        unseenNotifications.push({
+          type: "new-doctor-request-changed",
+          message: `Your doctor account application has been ${status} by the admin`,
+          onClickPath: "/notifications",
+          createdAt: new Date()
+        });
+        user.isDoctor = status === "approved" ? true : false;
+        await user.save();
+        console.log("Doctor account status notification sent to user:", user.name);
+      } else {
+        console.log("User not found for doctor account status notification");
+      }
 
       res.status(200).send({
         message: "Doctor status updated successfully",
@@ -66,7 +73,7 @@ router.post(
         data: doctor,
       });
     } catch (error) {
-      console.log(error);
+      console.log("Error changing doctor account status:", error);
       res.status(500).send({
         message: "Error applying doctor account",
         success: false,
@@ -95,3 +102,22 @@ router.get("/get-doctor-by-id/:doctorId", authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+
+// Get all appointments (admin)
+router.get("/get-all-appointments", authMiddleware, async (req, res) => {
+  try {
+    const appointments = await Appointment.find({});
+    res.status(200).send({
+      message: "Appointments fetched successfully",
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Error fetching appointments",
+      success: false,
+      error: error.message || error,
+    });
+  }
+});

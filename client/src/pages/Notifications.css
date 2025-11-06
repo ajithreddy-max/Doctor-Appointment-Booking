@@ -1,0 +1,300 @@
+/* Notifications Page Styles */
+.notifications-page {
+  padding: 24px;
+  /* Switch to a light neutral background for maximum contrast */
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+.page-title {
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-muted {
+  color: #4a4a4a !important;
+  font-size: 1.1rem;
+  margin: 8px 0 0 0;
+}
+
+/* Notifications Container */
+.notifications-container {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+/* Notification Tabs */
+.notification-tabs .ant-tabs-nav {
+  background: #f8f9fa;
+  margin: 0;
+  padding: 0 24px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.notification-tabs .ant-tabs-tab {
+  padding: 16px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.notification-tabs .ant-tabs-tab:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.notification-tabs .ant-tabs-tab-active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.notification-tabs .ant-tabs-content-holder {
+  padding: 24px;
+  background: white;
+}
+
+/* Notification Cards */
+.notification-card {
+  border: 1px solid #dfe3e8;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.notification-card.notification-unread {
+  border-left: 4px solid #3f51b5; /* stronger accent */
+  background: #ffffff; /* ensure maximum readability */
+}
+
+.notification-card.notification-unread::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* Notification Avatar */
+.notification-avatar {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Notification Content */
+.notification-content {
+  position: relative;
+}
+
+.notification-content .ant-typography {
+  margin: 0;
+}
+
+.notification-content .ant-typography strong {
+  color: #2c3e50;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.notification-content .ant-typography[type="secondary"] {
+  color: #4a4a4a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Notification Actions */
+.notification-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.notification-actions .ant-badge {
+  background: #ff4757;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+}
+
+/* Notification Tags */
+.notification-card .ant-tag {
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notification-card .ant-tag[color="info"] {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.notification-card .ant-tag[color="success"] {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+}
+
+.notification-card .ant-tag[color="warning"] {
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  color: white;
+}
+
+/* Time Display */
+.notification-content .ant-typography[type="secondary"]:last-child {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #95a5a6;
+}
+
+.notification-content .ant-typography[type="secondary"]:last-child .anticon {
+  margin-right: 4px;
+  color: #bdc3c7;
+}
+
+/* Buttons */
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 8px 20px;
+  height: auto;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.ant-btn-text.ant-btn-dangerous {
+  color: #e74c3c;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ant-btn-text.ant-btn-dangerous:hover {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+/* Empty State */
+.ant-empty {
+  padding: 40px 20px;
+}
+
+.ant-empty-description {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* Badge Count */
+.ant-badge-count {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .notification-tabs .ant-tabs-tab {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .notification-tabs .ant-tabs-content-holder {
+    padding: 16px;
+  }
+  
+  .notification-card {
+    margin-bottom: 8px;
+  }
+  
+  .notification-content {
+    margin-left: 8px;
+  }
+}
+
+/* Animation for new notifications */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-card {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Loading state */
+.notification-card.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Custom scrollbar for notification lists */
+.notification-tabs .ant-tabs-content-holder {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.notification-tabs .ant-tabs-content-holder::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-tabs .ant-tabs-content-holder::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.notification-tabs .ant-tabs-content-holder::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 3px;
+}
+
+.notification-tabs .ant-tabs-content-holder::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+}

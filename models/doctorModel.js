@@ -46,7 +46,7 @@ const doctorSchema = new mongoose.Schema(
       required: true,
     },
     experience: {
-      type: String,
+      type: Number,
       required: true,
     },
     feePerCunsultation: {
@@ -56,6 +56,23 @@ const doctorSchema = new mongoose.Schema(
     timings: {
       type: Array,
       required: true,
+    },
+    // Doctor weekly working days e.g., ["Mon","Tue","Wed","Thu","Fri"]
+    workingDays: {
+      type: [String],
+      default: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    },
+    // Slot duration in minutes for generating availability
+    slotDurationMinutes: {
+      type: Number,
+      default: 30,
+      min: 5,
+      max: 240,
+    },
+    // List of holiday dates in format DD-MM-YYYY
+    holidays: {
+      type: [String],
+      default: [],
     },
     status: {
       type: String,

@@ -42,7 +42,7 @@ function Userslist() {
     {
       title: "Created At",
       dataIndex: "createdAt",
-      render: (record , text) => moment(record.createdAt).format("DD-MM-YYYY"),
+      render: (text) => moment(text).format("DD-MM-YYYY"),
     },
     {
       title: "Actions",

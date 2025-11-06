@@ -15,7 +15,7 @@ function ProtectedRoute(props) {
       dispatch(showLoading())
       const response = await axios.post(
         "/api/user/get-user-info-by-id",
-        { token: localStorage.getItem("token") },
+        {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -40,12 +40,27 @@ function ProtectedRoute(props) {
     if (!user) {
       getUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   if (localStorage.getItem("token")) {
+    // Role-based redirects and guards
+    const path = window.location.pathname;
+    if (user?.isDoctor && path === "/") {
+      return <Navigate to="/doctor/dashboard" />;
+    }
+    if (user?.isAdmin && path === "/") {
+      return <Navigate to="/admin/dashboard" />;
+    }
+    if (!user?.isAdmin && path.startsWith("/admin")) {
+      return <Navigate to="/home" />;
+    }
+    if (!user?.isDoctor && path.startsWith("/doctor")) {
+      return <Navigate to="/home" />;
+    }
     return props.children;
   } else {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login/user" />;
   }
 }
 

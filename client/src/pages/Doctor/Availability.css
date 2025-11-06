@@ -1,0 +1,59 @@
+.availability-container {
+  padding: 16px;
+}
+
+.availability-container .ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.availability-container .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  color: white !important;
+}
+
+.availability-container .ant-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.availability-container .ant-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  transform: translateY(-2px) !important;
+}
+
+.availability-container .ant-card-head {
+  border-bottom: 2px solid #f1f5f9 !important;
+  padding: 16px 24px !important;
+}
+
+.availability-container .ant-card-head-title {
+  font-weight: 600 !important;
+  color: #111827 !important;
+  font-size: 18px !important;
+}
+
+.availability-container .ant-form-item-label > label {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #111827 !important;
+  margin-bottom: 8px !important;
+}
+
+.availability-container .ant-btn {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease-in-out !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}

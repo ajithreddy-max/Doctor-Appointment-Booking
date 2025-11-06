@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Layout from "../components/Layout";
-import { Col, Row, Button, Form, Input, message } from "antd";
+import { Col, Row, Button, Form, Input, message, Card, Typography } from "antd";
 import Doctor from "../components/Doctor";
 import { useDispatch, useSelector } from "react-redux";
 import { showLoading, hideLoading } from "../redux/alertsSlice";
+import "./Home.css";
+
+const { Title, Text } = Typography;
 
 function Home() {
   const [doctors, setDoctors] = useState([]);
-  const [recommendedDoctors, setRecommendedDoctors] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
@@ -31,14 +34,21 @@ function Home() {
 
   const onFinish = async (values) => {
     try {
-      const response = await axios.post("/api/user/recommend-doctor", { healthIssue: values.healthIssue });
+      const response = await axios.post("/api/user/search-doctors", { searchTerm: values.healthIssue }, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
       if (response.data.success) {
-        setRecommendedDoctors(response.data.data);
+        setSearchResults(response.data.data);
+        if (response.data.data.length === 0) {
+          message.info("No doctors found matching your search");
+        }
       } else {
         message.error(response.data.message);
       }
     } catch (error) {
-      message.error("Error fetching recommended doctors");
+      message.error("Error searching doctors");
     }
   };
 
@@ -46,43 +56,68 @@ function Home() {
     getData();
   }, []);
 
+  // Determine which doctors to display
+  const doctorsToDisplay = searchResults.length > 0 ? searchResults : doctors;
+
   return (
     <Layout>
-      <div>
-        <h1 className="page-title">Home</h1>
+      <div className="home-page">
+        <Title level={1} className="page-title">Find Your Perfect Doctor</Title>
         <hr />
-        <Row gutter={20} className="mt-5">
-          <Col span={24}>
-            <Form form={form} onFinish={onFinish} layout="vertical">
-              <Form.Item name="healthIssue" label="Enter your health issue" rules={[{ required: true, message: "Please input your health issue!" }]}>
-                <Input placeholder="e.g., headache, fever, heart pain" />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">Submit</Button>
-              </Form.Item>
-            </Form>
-          </Col>
-        </Row>
-        {recommendedDoctors.length > 0 && (
-          <Row gutter={20} className="mt-5">
-            <Col span={24}>
-              <h2>Recommended Doctors</h2>
-              <ul>
-                {recommendedDoctors.map((doctor) => (
-                  <li key={doctor._id}>{doctor.firstName} {doctor.lastName} - {doctor.specialization}</li>
-                ))}
-              </ul>
-            </Col>
-          </Row>
+        
+        {/* Search Section */}
+        <Card className="search-section">
+          <Form form={form} onFinish={onFinish} layout="vertical">
+            <Form.Item 
+              name="healthIssue" 
+              label="Search doctor" 
+              rules={[{ required: true, message: "Please enter doctor name to search!" }]}
+            >
+              <Input 
+                placeholder="Enter doctor name..." 
+                size="large"
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" size="large">
+                Search Doctor
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+
+        {/* Search Results Section */}
+        {searchResults.length > 0 && (
+          <Card className="recommended-doctors">
+            <Title level={2}>
+              {searchResults.length > 0 ? `Found ${searchResults.length} Doctor(s)` : "No Doctors Found"}
+            </Title>
+            {searchResults.length === 0 && (
+              <Text>No doctors found matching your search criteria.</Text>
+            )}
+          </Card>
         )}
+
+        {/* Doctors Section */}
+        <div className="doctors-grid">
+          <Row gutter={[24, 24]}>
+            {doctorsToDisplay.length > 0 ? (
+              doctorsToDisplay.map((doctor) => (
+                <Col span={8} xs={24} sm={12} lg={8} key={doctor._id}>
+                  <Doctor doctor={doctor} />
+                </Col>
+              ))
+            ) : (
+              <Col span={24}>
+                <div className="no-doctors">
+                  <Title level={3}>No Doctors Available</Title>
+                  <Text>There are currently no approved doctors in the system.</Text>
+                </div>
+              </Col>
+            )}
+          </Row>
+        </div>
       </div>
-      <Row gutter={20}>
-        {doctors.map((doctor) => (
-          <Col span={8} xs={24} sm={24} lg={8}>
-            <Doctor doctor={doctor} />
-          </Col>
-        ))}
-      </Row>
     </Layout>
   );
 }
